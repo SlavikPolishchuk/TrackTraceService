@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="AsrkFile.cs" />
     <Compile Include="FileBody.cs" />
+    <Compile Include="Seat.cs" />
     <Compile Include="Service1.cs">
       <SubType>Component</SubType>
     </Compile>
