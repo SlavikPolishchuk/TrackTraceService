@@ -1,0 +1,8 @@
+D:\TestService\TestService\TrackTraceService\TrackTraceService\bin\Debug\TrackTraceService.exe.config
+D:\TestService\TestService\TrackTraceService\TrackTraceService\bin\Debug\TrackTraceService.exe
+D:\TestService\TestService\TrackTraceService\TrackTraceService\bin\Debug\TrackTraceService.pdb
+D:\TestService\TestService\TrackTraceService\TrackTraceService\obj\Debug\TrackTraceService.csproj.AssemblyReference.cache
+D:\TestService\TestService\TrackTraceService\TrackTraceService\obj\Debug\TrackTraceService.csproj.SuggestedBindingRedirects.cache
+D:\TestService\TestService\TrackTraceService\TrackTraceService\obj\Debug\TrackTraceService.csproj.CoreCompileInputs.cache
+D:\TestService\TestService\TrackTraceService\TrackTraceService\obj\Debug\TrackTraceService.exe
+D:\TestService\TestService\TrackTraceService\TrackTraceService\obj\Debug\TrackTraceService.pdb
