@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace TrackTraceService
+
+
+namespace Track_Trace_JsonApi
 {
-    internal class FileBody
+    class FileBody
     {
         public FileBody() { }
         public FileBody(string _stringFileBody)
@@ -42,6 +46,8 @@ namespace TrackTraceService
         private string ReturnPrice { get; set; }
         private string OriginalID { get; set; }
 
+        public string DataStr { get; set; }
+
         private void ParseFileBody(string _fileBodyString)
         {
             int l = _fileBodyString.Length;
@@ -49,29 +55,30 @@ namespace TrackTraceService
             RegDate = _fileBodyString.Substring(13, 14).Trim().Substring(0, 8);
             TareId = _fileBodyString.Substring(27, 5).Trim();
             CountryTo = _fileBodyString.Substring(32, 3).Trim();
-            IndexTo = _fileBodyString.Substring(35, 5).Trim();
-            AddressTo = _fileBodyString.Substring(40, 255).Trim();
-            RecipientName = _fileBodyString.Substring(295, 255).Trim();
-            CountryFrom = _fileBodyString.Substring(550, 3).Trim();
-            IndexFrom = _fileBodyString.Substring(553, 5).Trim();
-            MailType = _fileBodyString.Substring(558, 10).Trim();
-            MailCtg = _fileBodyString.Substring(568, 10).Trim();
-            SendCtg = _fileBodyString.Substring(578, 10).Trim();
-            MailRank = _fileBodyString.Substring(588, 10).Trim();
-            TransType = _fileBodyString.Substring(598, 10).Trim();
-            PostMark = _fileBodyString.Substring(608, 10).Trim();
-            Weigth = _fileBodyString.Substring(618, 6).Trim();
-            Value = _fileBodyString.Substring(624, 10).Trim();
-            Payment = _fileBodyString.Substring(634, 10).Trim();
-            CustomsDuty = _fileBodyString.Substring(644, 10).Trim();
-            CustomsVAT = _fileBodyString.Substring(654, 10).Trim();
-            ContainerID = _fileBodyString.Substring(664, 13).Trim();
-            InvoiceID = _fileBodyString.Substring(677, 13).Trim();
-            AddresseePhoneNum = _fileBodyString.Substring(690, 15).Trim();
-            TareType = _fileBodyString.Substring(705, 10).Trim();
-            SenderName = _fileBodyString.Substring(715, 255).Trim();
-            ReturnPrice = _fileBodyString.Substring(970, 10).Trim();
-            OriginalID = _fileBodyString.Substring(980, 13).Trim();
+            IndexTo = _fileBodyString.Substring(35, 10).Trim();
+            AddressTo = _fileBodyString.Substring(45, 255).Trim();
+            RecipientName = _fileBodyString.Substring(300, 255).Trim();
+            CountryFrom = _fileBodyString.Substring(555, 3).Trim();
+            IndexFrom = _fileBodyString.Substring(558, 5).Trim();
+            MailType = _fileBodyString.Substring(563, 10).Trim();
+            MailCtg = _fileBodyString.Substring(573, 10).Trim();
+            SendCtg = _fileBodyString.Substring(583, 10).Trim();
+            MailRank = _fileBodyString.Substring(593, 10).Trim();
+            TransType = _fileBodyString.Substring(603, 10).Trim();
+            PostMark = _fileBodyString.Substring(613, 10).Trim();
+            Weigth = _fileBodyString.Substring(623, 6).Trim();
+            Value = _fileBodyString.Substring(629, 10).Trim();
+            Payment = _fileBodyString.Substring(639, 10).Trim();
+            CustomsDuty = _fileBodyString.Substring(649, 10).Trim();
+            CustomsVAT = _fileBodyString.Substring(659, 10).Trim();
+            ContainerID = _fileBodyString.Substring(669, 13).Trim();
+            InvoiceID = _fileBodyString.Substring(682, 13).Trim();
+            AddresseePhoneNum = _fileBodyString.Substring(695, 15).Trim();
+            TareType = _fileBodyString.Substring(710, 10).Trim();
+            SenderName = _fileBodyString.Substring(720, 255).Trim();
+            ReturnPrice = _fileBodyString.Substring(975, 10).Trim();
+            OriginalID = _fileBodyString.Substring(985, 13).Trim();
+            DataStr = _fileBodyString.Substring(13, 985).Trim();
         }
 
         public string InfoFileBody()
@@ -134,5 +141,4 @@ namespace TrackTraceService
         OriginalID);
         }
     }
-}
 }

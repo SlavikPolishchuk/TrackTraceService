@@ -5,15 +5,20 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using TrackTraceService;
 
-namespace TrackTraceService
+namespace Track_Trace_JsonApi
 {
     internal class DALTrackTraceJsonApi
     {
         public string ConnectionString { get; set; }
         private string sqlText = string.Empty;
+        public string MessageState { get; set; }
 
         public DALTrackTraceJsonApi()
         {
@@ -34,7 +39,9 @@ namespace TrackTraceService
 
             sqlText = @"SELECT FILE_ID, FILE_NAME, FILE_BODY, CREATE_DATE, IS_SENDED, SEND_DATE
             FROM BOU.ASRK_FILES_EXPORT
-            WHERE IS_SENDED =1 AND rownum<=3";
+            WHERE IS_SENDED =1 AND rownum <= 1";//AND rownum <= 1
+
+            //sqlText = @"SELECT * from BOU.ASRK_FILES_EXPORT WHERE FILE_ID = 219312";
 
             using (OracleConnection oracleConnection = new OracleConnection(ConnectionString))
             {
@@ -62,11 +69,11 @@ namespace TrackTraceService
             return _listAsrkFile;
         }
 
-        public bool SetIsSended(AsrkFile _asrkFile)
+        public bool SetIsSended(AsrkFile _asrkFile, int _statusType)
         {
             try
             {
-                sqlText = string.Format($"UPDATE BOU.ASRK_FILES_EXPORT SET IS_SENDED=2 WHERE FILE_ID={_asrkFile.FileId} AND FILE_NAME='{_asrkFile.FileName}'");
+                sqlText = string.Format($"UPDATE BOU.ASRK_FILES_EXPORT SET IS_SENDED={_statusType} WHERE FILE_ID={_asrkFile.FileId} AND FILE_NAME='{_asrkFile.FileName}'");
 
                 using (OracleConnection oracleConnection = new OracleConnection(ConnectionString))
                 {
@@ -82,6 +89,28 @@ namespace TrackTraceService
             catch (Exception e)
             {
                 return false;
+            }
+        }
+
+        public void InsertIntoAsrkFilesExportApi(int _fileId, string _barcode, string _datastr, int _state, string _message)
+        {
+            sqlText = string.Format(@"INSERT INTO BOU.ASRK_FILES_EXPORT_API " +
+                @" (FILE_ID, BARCODE, DATASTR, DATEINS, STATE, MESSAGE) " +
+                @" VALUES( :fileId, :barcode, :datastr, SYSDATE, :state, :message)");
+
+            using (OracleConnection oracleConnection = new OracleConnection(ConnectionString))
+            {
+                oracleConnection.Open();
+
+                OracleCommand command = new OracleCommand(sqlText, oracleConnection);
+                command.Parameters.Add("fileId", _fileId);
+                command.Parameters.Add("barcode", _barcode);
+                command.Parameters.Add("datastr", (_datastr.Length <= 980) ? _datastr.Substring(1, _datastr.Length - 1).Trim() : _datastr.Substring(1, 980).Trim());
+                command.Parameters.Add("state", _state);
+                command.Parameters.Add("message", _message);
+                command.ExecuteNonQuery();
+
+                oracleConnection.Close();
             }
         }
 
@@ -145,57 +174,57 @@ namespace TrackTraceService
             return fileBodies;
         }
 
-        public string GetApiOmsPostOrdersJson(AsrkFile _asrkFile)
+        public string GetApiOmsPostOrdersJson(FileBody body/*AsrkFile _asrkFile*/)
         {
             List<PostApiOmsJsonOrders> _postApiOmsJsons = new List<PostApiOmsJsonOrders>();
             List<Seat> _seat = new List<Seat>();
 
-            foreach (FileBody body in _asrkFile.fileBody)
+            //foreach (FileBody body in _asrkFile.fileBody)
+            //{
+            _seat.Clear();
+            _seat.Add(new Seat(body.Id.Trim(), body.Weigth.Trim()));
+            _postApiOmsJsons.Add(new PostApiOmsJsonOrders()
             {
-                _seat.Clear();
-                _seat.Add(new Seat(body.Id.Trim(), body.Weigth.Trim()));
-                _postApiOmsJsons.Add(new PostApiOmsJsonOrders()
-                {
-                    recip_post_code = " ",
-                    extr_guid_order = body.Id.Trim(),
-                    ext_doc_numb = body.Id.Trim(),
-                    ext_doc_date = Convert.ToDateTime(body.RegDate).ToShortDateString(),
-                    status_date = Convert.ToDateTime(body.RegDate).ToShortDateString(),
-                    send_name = (string.IsNullOrEmpty(body.SenderName.Trim())) ? " " : body.SenderName.Trim(),
-                    send_contact_tel = "",
-                    send_address = body.AddressTo.Trim(),
-                    recip_name = (string.IsNullOrEmpty(body.RecipientName.Trim())) ? " " : body.RecipientName.Trim(),
-                    recip_contact_tel = body.AddresseePhoneNum.Trim(),
-                    recip_address = body.AddressTo.Trim(),
-                    mail_type = body.MailType.Trim(),
-                    seats = _seat
-                });
+                recip_post_code = " ",
+                extr_guid_order = body.Id.Trim(),
+                ext_doc_numb = body.Id.Trim(),
+                ext_doc_date = Convert.ToDateTime(body.RegDate).ToString() /*.ToShortDateString()*/,
+                status_date = Convert.ToDateTime(body.RegDate).ToString()/*.ToShortDateString()*/,
+                send_name = (string.IsNullOrEmpty(body.SenderName.Trim())) ? " " : body.SenderName.Trim(),
+                send_contact_tel = "",
+                send_address = body.AddressTo.Trim(),
+                recip_name = (string.IsNullOrEmpty(body.RecipientName.Trim())) ? " " : body.RecipientName.Trim(),
+                recip_contact_tel = body.AddresseePhoneNum.Trim(),
+                recip_address = body.AddressTo.Trim(),
+                mail_type = body.MailType.Trim(),
+                seats = _seat
+            });
 
-            }
+            //}
 
             return JsonConvert.SerializeObject(_postApiOmsJsons);
             //return JsonSerializer.Serialize(_postApiOmsJsons);
         }
 
 
-        public string GetApiOmsPostOrdersStatusJson(AsrkFile _asrkFile)
+        public string GetApiOmsPostOrdersStatusJson(FileBody body/*AsrkFile _asrkFile*/)
         {
             List<PostApiOmsJsonOrderStatus> _postApiOmsJsons = new List<PostApiOmsJsonOrderStatus>();
 
-            foreach (FileBody body in _asrkFile.fileBody)
+            //foreach (FileBody body in _asrkFile.fileBody)
+            //{
+            _postApiOmsJsons.Add(new PostApiOmsJsonOrderStatus()
             {
-                _postApiOmsJsons.Add(new PostApiOmsJsonOrderStatus()
-                {
-                    extr_guid_order = body.Id.Trim(),
-                    status_code = "90801",
-                    status_date = Convert.ToDateTime(body.RegDate).ToShortDateString(),
-                    reason_ext_id = "",
-                    location = body.AddressTo.Trim(),
-                    exec_subdiv_id = "",
-                    barcode_gu = body.Id.Trim()
-                });
+                extr_guid_order = body.Id.Trim(),
+                status_code = "90801",
+                status_date = Convert.ToDateTime(body.RegDate).ToShortDateString(),
+                reason_ext_id = "",
+                location = body.AddressTo.Trim(),
+                exec_subdiv_id = "",
+                barcode_gu = body.Id.Trim()
+            });
 
-            }
+            //}
 
             return JsonConvert.SerializeObject(_postApiOmsJsons);
         }
@@ -206,15 +235,18 @@ namespace TrackTraceService
 
             using (HttpClient _httpClient = new HttpClient())
             {
+                _httpClient.Timeout = TimeSpan.FromMinutes(5);
                 HttpContent _httpContent = new StringContent(_jsonPostText, Encoding.UTF8, "application/json");
+
                 var request = new HttpRequestMessage(HttpMethod.Post, _requestUrl);
                 request.Content = _httpContent;
                 request.Headers.Add("api_key", _apiKey);
+
                 var response = await _httpClient.SendAsync(request);
+                MessageState = response.ReasonPhrase;
                 return response.IsSuccessStatusCode;
             }
         }
 
     }
-}
 }

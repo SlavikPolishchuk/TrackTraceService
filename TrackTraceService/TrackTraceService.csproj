@@ -83,6 +83,7 @@
     <Compile Include="AsrkFile.cs" />
     <Compile Include="DALTrackTraceJsonApi.cs" />
     <Compile Include="FileBody.cs" />
+    <Compile Include="PostApiOmsJson.cs" />
     <Compile Include="PostApiOmsJsonOrderStatus.cs" />
     <Compile Include="Seat.cs" />
     <Compile Include="Service1.cs">
